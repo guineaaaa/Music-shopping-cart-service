@@ -1,13 +1,15 @@
+// src/pages/ProductPage.js
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import cartItems from '../constants/cartItems';
 import { CartIcon, ChevronDown, ChevronUp } from '../constants/icons';
+import Spinner from '../constants/Spinner';
 import {
   addItem,
   increase,
   decrease,
   calculateTotals,
+  fetchCartItems,
 } from '../redux/cartSlice';
 import { openModal } from '../redux/modalSlice';
 
@@ -16,34 +18,34 @@ const ProductPage = () => {
   const cart = useSelector((state) => state.cart);
 
   useEffect(() => {
-    // 임시 데이터를 카트에 추가
-    cartItems.forEach(item => {
-      dispatch(addItem(item));
-    });
+    dispatch(fetchCartItems());
   }, [dispatch]);
 
   useEffect(() => {
     dispatch(calculateTotals());
   }, [cart, dispatch]);
 
-  // ClearButton 클릭 시 모달 열기
   const handleClearCart = () => {
     dispatch(openModal());
   };
 
+  if(cart.status==='loading'){
+    return <Spinner />;
+  }
+
   return (
     <Container>
       <NavBar>
-        <Title>기니 playlist</Title>
+        <Title>Real Data Guinea Playlist 🍄</Title>
         <CartIconWrapper>
           <CartIcon />
-          <CartItemCount>{cart.items.reduce((total, item) => total + item.quantity, 0)}</CartItemCount>
+          <CartItemCount>{cart.cartItems.reduce((total, item) => total + item.quantity, 0)}</CartItemCount>
         </CartIconWrapper>
       </NavBar>
 
       <Heading>당신이 선택한 음반</Heading>
       <CartList>
-        {cart.items.map((item) => (
+        {cart.cartItems.map((item) => (
           <CartItem key={item.id}>
             <CartImage src={item.img} alt={item.title} />
             <CartDetails>
@@ -76,8 +78,6 @@ const ProductPage = () => {
 export default ProductPage;
 
 // Styled Components...
-
-
 const Container = styled.div`
   padding: 20px;
   background-color: #d6f5ff;
@@ -89,29 +89,29 @@ const NavBar = styled.nav`
   justify-content: space-between;
   padding: 20px;
   background-color: #005eff;
-  color:white;
+  color: white;
 `;
 
 const Title = styled.h1`
   font-size: 24px;
-  font-weight:900;
+  font-weight: 900;
 `;
 
 const CartIconWrapper = styled.div`
   position: relative;
   width: 60px;
   cursor: pointer;
-  color:white;
+  color: white;
 `;
 
 const CartItemCount = styled.div`
   position: absolute;
   top: -10px;
   right: -10px;
-  background-color:#84C2FF;
+  background-color: #84c2ff;
   color: white;
-  border-radius: 50%;
-  padding: 5px;
+  border-radius: 100%;
+  padding: 10px;
   font-size: 20px;
 `;
 
@@ -146,7 +146,6 @@ const CartDetails = styled.div`
   align-items: center;
   width: 100%;
   margin-left: 10px;
-  
 `;
 
 const TextDetails = styled.div`
@@ -156,12 +155,12 @@ const TextDetails = styled.div`
 
 const CartTitle = styled.h3`
   font-size: 18px;
-  margin-bottom:-5px;
+  margin-bottom: -5px;
 `;
 
 const CartSinger = styled.p`
   font-size: 16px;
-  margin-bottom:-10px;
+  margin-bottom: -10px;
 `;
 
 const CartPrice = styled.p`
@@ -178,7 +177,7 @@ const ControlButton = styled.button`
   border: none;
   cursor: pointer;
   color: blue;
-  
+
   svg {
     width: 24px;
     height: 24px;
@@ -200,13 +199,13 @@ const ClearButton = styled.button`
   padding: 10px;
   background-color: white;
   color: red;
-  font-weight:bold;
-  border:2px solid;
-  border-radius:10px;
+  font-weight: bold;
+  border: 2px solid;
+  border-radius: 10px;
   cursor: pointer;
   box-shadow: 0 4px 8px -4px black;
   &:hover {
-    background-color: rgb(228, 8, 10,0.5);
+    background-color: rgba(228, 8, 10, 0.5);
   }
 `;
 
