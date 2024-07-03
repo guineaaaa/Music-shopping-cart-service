@@ -81,6 +81,7 @@ const cartSlice = createSlice({
         state.error = action.error.message;
         alert(action.payload);
       });
+      
   },
 });
 
